@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Laporan Stok - Kasir App{% endblock %}
+{% block page_title %}Laporan Stok Produk{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Laporan Stok</h5>
+    <a href="{{ url_for('product.add') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i> Tambah Produk
+    </a>
+</div>
+
+{% set low_stock = products | selectattr('stock', 'lt', threshold) | list %}
+{% if low_stock %}
+<div class="alert alert-warning d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span>Terdapat <strong>{{ low_stock | length }}</strong> produk dengan stok di bawah {{ threshold }}. Segera lakukan restok.</span>
+</div>
+{% endif %}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>SKU</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Harga Jual</th>
+                        <th>Stok</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr class="{{ 'table-warning' if p.stock < threshold else '' }}">
+                        <td class="text-muted small">{{ loop.index }}</td>
+                        <td><code>{{ p.sku }}</code></td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.category.name if p.category else '-' }}</td>
+                        <td>Rp {{ "{:,.0f}".format(p.sell_price) }}</td>
+                        <td>
+                            <span class="fw-bold {{ 'text-danger' if p.stock == 0 else ('text-warning' if p.stock < threshold else 'text-success') }}">
+                                {{ p.stock }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if p.stock == 0 %}
+                            <span class="badge bg-danger">Habis</span>
+                            {% elif p.stock < threshold %}
+                            <span class="badge bg-warning text-dark">Stok Menipis</span>
+                            {% else %}
+                            <span class="badge bg-success">Aman</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Belum ada produk aktif.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Produk - Kasir App{% endblock %}
+{% block page_title %}Manajemen Produk{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Daftar Produk</h5>
+    <a href="{{ url_for('product.add') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i> Tambah Produk
+    </a>
+</div>
+
+<!-- Search -->
+<form method="GET" class="mb-3">
+    <div class="input-group" style="max-width: 360px;">
+        <input type="text" class="form-control" name="q" value="{{ q }}" placeholder="Cari nama atau SKU...">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+        {% if q %}
+        <a href="{{ url_for('product.index') }}" class="btn btn-outline-danger"><i class="bi bi-x"></i></a>
+        {% endif %}
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>SKU</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Harga Jual</th>
+                        <th>Stok</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td class="text-muted small">{{ loop.index }}</td>
+                        <td><code>{{ p.sku }}</code></td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.category.name if p.category else '-' }}</td>
+                        <td>Rp {{ "{:,.0f}".format(p.sell_price) }}</td>
+                        <td>
+                            {% if p.stock < 10 %}
+                            <span class="badge bg-warning text-dark">{{ p.stock }}</span>
+                            {% else %}
+                            <span class="badge bg-light text-dark border">{{ p.stock }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.is_active %}
+                            <span class="badge bg-success">Aktif</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Nonaktif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('product.edit', id=p.id) }}"
+                               class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('product.delete', id=p.id) }}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Nonaktifkan produk ini?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            Tidak ada produk ditemukan.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

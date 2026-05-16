@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Kasir (POS) - Kasir App{% endblock %}
+{% block page_title %}Kasir (Point of Sale){% endblock %}
+
+{% block head %}
+<style>
+    #pos-search-results { max-height: 380px; overflow-y: auto; }
+    .product-result-item { cursor: pointer; }
+    .product-result-item:hover { background: #e8f4fd; }
+    #cart-table td { vertical-align: middle; }
+    .qty-input { width: 60px; text-align: center; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3" style="min-height: calc(100vh - 140px);">
+
+    <!-- Left: Product Search -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="bi bi-search text-primary"></i>
+                    </span>
+                    <input type="text" id="pos-search" class="form-control border-start-0 ps-0"
+                           placeholder="Cari produk berdasarkan nama atau SKU..." autofocus>
+                </div>
+            </div>
+            <div class="card-body p-0" id="pos-search-results">
+                <div class="text-center text-muted py-5" id="search-placeholder">
+                    <i class="bi bi-search fs-2 mb-2 d-block opacity-25"></i>
+                    Ketik untuk mencari produk
+                </div>
+                <div class="list-group list-group-flush" id="product-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Cart -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm d-flex flex-column" style="height: 100%;">
+            <div class="card-header bg-white fw-semibold d-flex justify-content-between">
+                <span><i class="bi bi-cart3 me-2"></i>Keranjang</span>
+                <button class="btn btn-sm btn-outline-danger" onclick="clearCart()">
+                    <i class="bi bi-trash"></i> Kosongkan
+                </button>
+            </div>
+
+            <div class="card-body p-0 flex-grow-1 overflow-auto">
+                <table class="table table-sm mb-0" id="cart-table">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th>Produk</th>
+                            <th style="width:90px">Qty</th>
+                            <th style="width:110px">Subtotal</th>
+                            <th style="width:36px"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-body">
+                        <tr id="cart-empty-row">
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <i class="bi bi-cart-x d-block fs-2 mb-1 opacity-25"></i>
+                                Keranjang kosong
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-semibold">Total</span>
+                    <span class="fs-5 fw-bold text-primary" id="cart-total">Rp 0</span>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold mb-1">Uang Diterima (Rp)</label>
+                    <input type="number" id="paid-amount" class="form-control" min="0"
+                           placeholder="0" oninput="updateChange()">
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="small text-muted">Kembalian</span>
+                    <span class="fw-semibold text-success" id="change-display">Rp 0</span>
+                </div>
+                <button id="btn-checkout" class="btn btn-success w-100 py-2 fw-semibold" onclick="processCheckout()">
+                    <i class="bi bi-check-circle me-1"></i> Proses Pembayaran
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pos.js') }}"></script>
+{% endblock %}

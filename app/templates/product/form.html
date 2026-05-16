@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% set is_edit = product is not none %}
+{% block title %}{{ 'Edit' if is_edit else 'Tambah' }} Produk - Kasir App{% endblock %}
+{% block page_title %}{{ 'Edit' if is_edit else 'Tambah' }} Produk{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-3">
+    <a href="{{ url_for('product.index') }}" class="btn btn-sm btn-outline-secondary me-3">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <h5 class="fw-bold mb-0">{{ 'Edit' if is_edit else 'Tambah' }} Produk</h5>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width: 640px;">
+    <div class="card-body">
+        <form method="POST" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">SKU / Kode Produk <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="sku"
+                           value="{{ product.sku if is_edit else '' }}" required>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">Nama Produk <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name"
+                           value="{{ product.name if is_edit else '' }}" required>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">Kategori</label>
+                    <select class="form-select" name="category_id">
+                        <option value="">-- Tanpa Kategori --</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}"
+                            {{ 'selected' if is_edit and product.category_id == cat.id else '' }}>
+                            {{ cat.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Harga Beli (Rp) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" name="buy_price" min="0" step="1"
+                           value="{{ product.buy_price if is_edit else '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Harga Jual (Rp) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" name="sell_price" min="0" step="1"
+                           value="{{ product.sell_price if is_edit else '' }}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Stok <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" name="stock" min="0" step="1"
+                           value="{{ product.stock if is_edit else 0 }}" required>
+                </div>
+
+                {% if is_edit %}
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Status</label>
+                    <select class="form-select" name="is_active">
+                        <option value="1" {{ 'selected' if product.is_active else '' }}>Aktif</option>
+                        <option value="0" {{ 'selected' if not product.is_active else '' }}>Nonaktif</option>
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i> {{ 'Perbarui' if is_edit else 'Simpan' }}
+                </button>
+                <a href="{{ url_for('product.index') }}" class="btn btn-outline-secondary">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

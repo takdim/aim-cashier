@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Laporan Penjualan - Kasir App{% endblock %}
+{% block page_title %}Laporan Penjualan{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Laporan Penjualan</h5>
+</div>
+
+<!-- Filter -->
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-3">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-auto">
+                <label class="form-label small fw-semibold mb-1">Dari Tanggal</label>
+                <input type="date" class="form-control form-control-sm" name="start"
+                       value="{{ start_date.strftime('%Y-%m-%d') }}">
+            </div>
+            <div class="col-auto">
+                <label class="form-label small fw-semibold mb-1">Sampai Tanggal</label>
+                <input type="date" class="form-control form-control-sm" name="end"
+                       value="{{ end_date.strftime('%Y-%m-%d') }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-funnel me-1"></i> Filter
+                </button>
+            </div>
+            <div class="col-auto ms-auto">
+                <a href="{{ url_for('report.export_sales_csv', start=start_date, end=end_date) }}"
+                   class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary -->
+<div class="row g-3 mb-3">
+    <div class="col-sm-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="text-muted small">Total Transaksi</div>
+            <div class="fs-4 fw-bold">{{ transactions | length }}</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="text-muted small">Total Pendapatan</div>
+            <div class="fs-5 fw-bold text-success">Rp {{ "{:,.0f}".format(total_revenue) }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>No. Struk</th>
+                        <th>Kasir</th>
+                        <th>Total</th>
+                        <th>Bayar</th>
+                        <th>Kembalian</th>
+                        <th>Waktu</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td class="text-muted small">{{ loop.index }}</td>
+                        <td><span class="badge bg-secondary">{{ t.invoice_no }}</span></td>
+                        <td>{{ t.user.name }}</td>
+                        <td class="fw-semibold">Rp {{ "{:,.0f}".format(t.total_amount) }}</td>
+                        <td>Rp {{ "{:,.0f}".format(t.paid_amount) }}</td>
+                        <td>Rp {{ "{:,.0f}".format(t.change_amount) }}</td>
+                        <td class="text-muted small">{{ t.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('transaction.detail', id=t.id) }}"
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-receipt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            Tidak ada transaksi pada periode ini.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
